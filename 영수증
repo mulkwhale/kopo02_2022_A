@@ -1,0 +1,134 @@
+package Mini0425;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+public class Main {
+	
+	public static int netprice(int price, double rate) {
+		return (int)(price / (1 + rate) + 0.5); // 반올림
+	}
+	
+	public static String subStrByte(String str, int cutlen) {
+		StringBuffer sbStr = new StringBuffer(cutlen);
+		int nCnt = 0;
+		for (char ch: str.toCharArray()) {
+			nCnt += String.valueOf(ch).getBytes().length;
+			if (nCnt > cutlen)
+				break;
+			sbStr.append(ch);
+			
+		}
+		if (nCnt > sbStr.length()) { // 추가
+			nCnt = sbStr.toString().getBytes().length;
+			for (int i = 0; i < (cutlen - nCnt); i++) {
+				sbStr.append(" ");
+			}
+		}
+		
+		return sbStr.toString();
+	}	
+
+	public static void main(String[] args) {
+		DecimalFormat df = new DecimalFormat("###,###,###,###,###");
+		Calendar calt = Calendar.getInstance();
+		SimpleDateFormat sdt = new SimpleDateFormat("YYYY-MM-dd HH:mm");
+		SimpleDateFormat sdts = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+		SimpleDateFormat sdtsd = new SimpleDateFormat("YYYYMMdd");
+		double taxRate = 0.1;
+		
+		String[] itemname = {"초코파이", "바나나우유", "건포도", "오렌지주스", "초코에몽"
+				, "해피홈 SAFE365 핸드크림", "(G)LH원형유리화병 1000", "상투과자E", "더블링 나일론 깡 롤 브러쉬", "해피홈 SAFE 핸드워시"
+				, "농심 신라면120g*5", "(대)국내산삼겹살찌개", "오뚜기 진비빔면 156g", "GAP 죽장사과 4-6입/봉", "순 유기농 바나나(봉)"
+				, "피코크 탄두리 닭가슴살", "(달콤)순살닭강정(g)", "DZ주니어양말3족C_BK", "DZ주니어양말3족C_WH", "프리미엄생연어초밥"
+				, "피코크 들깨미역국500g", "남양 맛있는우유GT 저지방", "녹차원흑당시럽10입", "진라면소컵(매)65g*6", "케라시스 앰플 트리트먼트"
+				, "푸르밀 미숫가루우유", "자일로스갈색설탕500g", "CJ 비비고칩 20G", "피코크 들깨미역국500g매운맛", "흑원당 말차 밀크티"};
+		int[] price = {61000, 25500, 3300, 25000, 100, 7500, 69600, 59840, 33500, 115500
+				, 335550, 66110, 27520, 10800, 4980, 2480, 7920, 49580, 4980, 732130
+				, 33980, 4480, 4980, 3210, 6950, 5960, 10990, 10980, 36980, 44840}; // 단가
+		int[] num = {20, 40, 10, 10, 10, 20, 10, 10, 10, 20
+				, 11, 12, 13, 14, 15, 16, 17, 18, 91, 21
+				, 101, 16, 19, 41, 15, 27, 91, 31, 21, 41}; // 수량
+		boolean[] taxfree = {true, true, false, true, true
+				, false, false, false, false, false
+				, false, true, false, true, true
+				, false, false, false, false, false
+				, false, true, false, false, false
+				, false, false, false, false, false}; // 면세유무
+		String taxStar = null;
+		int sumNum = 0;
+		int sumTaxFree = 0;
+		int sumTax = 0;
+		int sumPrice = 0;
+		
+		for (int i = 0; i < itemname.length; i++) {
+			if (taxfree[i]) {
+				sumTaxFree += price[i] * num[i];
+			} else {
+				sumTax += price[i] * num[i];
+			}
+			sumPrice += price[i] * num[i];
+		}
+		
+		int netprice = netprice(sumTax, taxRate);
+		int tax = sumTax - netprice;
+		
+		for (int i = 0; i < num.length; i++) {
+			sumNum += num[i];
+		}
+		
+		System.out.printf("           %s\n", "이마트 죽전점 (031)888-1234");
+		System.out.printf("   emart   %s\n", "206-86-50913 강희석");
+		System.out.printf("           %s\n", "용인 수지구 포은대로 552");
+		System.out.println();
+		System.out.println("영수증 미지참시 교환/환불 불가");
+		System.out.println("정상상품에 한함, 30일 이내(신선 7일)");
+		System.out.println("※일부 브랜드매장 제외(매장 고지물참조)");
+		System.out.println("교환/환불 구매점에서 가능(결제카드 지참)");
+		System.out.println();
+		System.out.printf("[구 매]%s%25s\n", sdt.format(calt.getTime()), "POS:0011-9861");
+		System.out.println("------------------------------------------------");
+		System.out.printf("%5s %15s %5s %8s\n", "  상 품 명", "단 가", "수량", "금 액");
+		for (int i = 0; i < itemname.length; i++) {
+			// 20개
+			String itemResult = subStrByte(itemname[i], 15);
+			
+			if (i % 5 == 0) {
+				System.out.println("------------------------------------------------");
+			}
+			if (taxfree[i]) {
+				taxStar = "*";
+			} else {
+				taxStar = " ";
+			}
+			System.out.printf("%s %s %9s %5d %10s\n", taxStar, itemResult, df.format(price[i]), num[i], df.format(price[i] * num[i]));
+		}
+		System.out.println();
+		System.out.printf("%22s %20d\n", "총 품목 수량", sumNum);
+		System.out.printf(" %22s %20s\n", "(*)면 세  물 품", df.format(sumTaxFree));
+		System.out.printf(" %22s %20s\n", "과 세  물 품", df.format(netprice));
+		System.out.printf("  %22s %20s\n", "부   가   세", df.format(tax));
+		System.out.printf("   %22s %20s\n", "합        계", df.format(sumPrice));
+		System.out.printf("%s %30s\n", "결 제 대 상 금 액", df.format(sumPrice));
+		System.out.println("------------------------------------------------");
+		System.out.printf("%s  %33s\n", "0012 KEB 하나", "541707**0484/35860658");
+		System.out.printf("%s  %21s%s\n", "카드결제(IC)", "일시불 / ", df.format(sumPrice));
+		System.out.println("------------------------------------------------");
+		System.out.printf("         [%s]\n", "신세계포인트 적립");
+		System.out.printf("%s\n", "홍*두 고객님의 포인트 현황입니다.");
+		System.out.printf("%s %20s %12s\n", "금회발생포인트", "9350**9995", df.format(sumPrice / 1000));
+		System.out.printf("%s %17s(%12s)\n", "누계(가용)포인트", df.format(5637), df.format(5473));
+		System.out.printf("%s\n", "*신세계포인트 유효기간은 2년입니다.");
+		System.out.println("------------------------------------------------");
+		System.out.printf("      %s\n", "구매금액기준 무료주차시간 자동부여");
+		System.out.printf("%s %35s\n", "차량번호 : ", "34저****");
+		System.out.printf("%s %36s\n", "입차시간 : ", sdts.format(calt.getTime()));
+		System.out.println("------------------------------------------------");
+		System.out.printf("%s %31s\n", "캐셔:084599 양OO", "1150");
+		System.out.printf("   %s\n", "||||||||||||||||||||||||||||||||||||||||||");
+		System.out.printf("   %s\n", "||||||||||||||||||||||||||||||||||||||||||");
+		System.out.printf("%17s%s\n", sdtsd.format(calt.getTime()), "/00119861/00164980/31");
+	}
+
+}
